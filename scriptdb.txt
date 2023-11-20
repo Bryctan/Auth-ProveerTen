@@ -1,0 +1,153 @@
+create database ProveerTen;
+use ProveerTen; 
+
+create table Provider (
+nit_provider char(15) not null,
+email_provider varchar (55) primary key, 
+name_provider varchar (50) not null,
+last_name_provider varchar (40) not null,
+name_company varchar (100) not null,
+city_provider varchar (40) not null,
+password_provider varchar (100),
+profile_photo_provider varchar (100) null,
+cover_photo_provier varchar (100) null,
+description_provider varchar(1000)
+);
+
+create table ProviderPhone (
+number_provider varchar (15),
+fk_phone_email_provider varchar (55),
+foreign key (fk_Phone_email_Provider) references Provider (email_Provider)
+);
+
+create table ProviderAddress (
+neighborhood varchar (40) not null,
+street varchar (30) not null,
+number_street varchar(20),
+fk_address_email_provider varchar (55),
+foreign key (fk_address_email_provider) references Provider (email_provider)
+);
+
+create table Grocer (
+email_grocer varchar (55) primary key,
+name_grocer varchar (40) not null,
+last_name_grocer varchar (40) not null,
+name_store varchar (50) not null,
+city_grocer varchar (40) not null,
+password_grocer varchar (100)
+);
+
+create table GrocerAddress (
+neighborhood varchar (40) not null,
+street varchar (30) not null,
+number_street varchar(20),
+fk_address_email_grocer varchar (55),
+foreign key (fk_address_email_grocer) references Grocer (email_grocer)
+);
+
+create table GrocerPhone (
+number_grocer varchar (15),
+fk_phone_email_grocer varchar (55),
+foreign key (fk_phone_email_grocer) references grocer (email_grocer)
+);
+
+
+delimiter //
+create procedure insertProvider
+(
+    in nit_provider_ char(15),
+    in email_provider_ varchar (55),
+    in name_provider_ varchar (50),
+    in last_name_provider_ varchar (40),
+    in name_company_ varchar(100),
+    in city_provider_ varchar(40),
+    in password_provider_ varchar(100),
+    in description_provider_ varchar(1000),
+    
+    in number_provider_ varchar (15),
+
+    in neighborhood_ varchar (40),
+    in street_ varchar(30),
+    in number_street_ varchar(20),
+    out message_text varchar(255)
+)
+  
+begin
+    declare count_provider int;
+    
+    select count(*) into count_provider from provider where email_provider = email_provider_;
+
+    if count_provider > 0 then
+        set message_text = 'error the provider account already exists or review the information';
+    else
+        insert into provider (
+            nit_provider,
+            email_provider,
+            name_provider,
+            last_name_provider,
+            name_company,
+            city_provider,
+            password_provider,
+            description_provider
+        ) values (
+            nit_provider_,
+            email_provider_,
+            name_provider_,
+            last_name_provider_,
+            name_company_,
+            city_provider_,
+            password_provider_,
+            description_provider_
+        );
+
+        insert into ProviderPhone (number_provider, fk_phone_email_provider) values (number_provider_, email_provider_);
+        insert into ProviderAddress (neighborhood, street, number_street, fk_address_email_provider) values (neighborhood_, street_, number_street_, email_provider_);
+
+        set message_text = 'the provider was successfully entered';
+    end if;
+    select message_text;
+end //
+
+call insertProvider ("2238t9-25", "proveerTen02@gmail.com", "Alejandro", "Alvarado", "Proveerten", "Armenia", "5522", "prueba 1", "3106124260", "El Granada", "15", "3b",@message_text);
+
+select * from provider;
+
+
+delimiter //
+create procedure insertGrocer (
+	in email_grocer_ varchar (55),
+	in name_grocer_ varchar (40),
+    in last_name_grocer_ varchar (40),
+    in name_store_ varchar (50),
+    in city_grocer_ varchar (40),
+    in password_grocer_ varchar (100),
+    in number_grocer_ varchar (15),
+    in neighborhood_ varchar (40),
+    in street_ varchar (30),
+    in number_street_ varchar (20),
+    out message_text varchar(255)
+)
+begin 
+	declare countGrocer int;
+    
+    select count(*)  into countGrocer from Grocer where email_grocer = email_grocer_;
+    
+		if countgrocer > 0 then 
+        set message_text = 'error the grocer account already exists or review the information';
+        
+        else 
+        insert into Grocer values (email_grocer_, name_grocer_, last_name_grocer_, name_store_,city_grocer_,password_grocer_);
+		insert into GrocerPhone values (number_grocer_,email_grocer_);
+         insert into GrocerAddress  values (neighborhood_,street_ ,number_street_, email_grocer_ );
+         set message_text = 'The grocer was successfully entered';
+         
+         end if;
+         select message_text;
+end //
+delimiter ;
+
+
+call insertGrocer ("prove@gmail.com", "Jhoan", "Alvarado", "tiendaQQ", "Armenia", "12345", "3106124260", "El modelo", "25", "6g",@message_text);
+select * from Grocer;
+select * from GrocerAddress;
+select * from GrocerPhone;
